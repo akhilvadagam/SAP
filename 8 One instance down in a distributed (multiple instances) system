@@ -1,0 +1,22 @@
+#!/bin/bash
+
+# SAP Instance Number
+INSTANCE_NUMBER="00"
+
+# SAP Control Command
+SAPCONTROL_CMD="/sapmnt/TS1/exe/uc/linuxx86_64/sapcontrol -nr $INSTANCE_NUMBER -function GetProcessList"
+
+# Run SAP Control Command
+SAP_CONTROL_OUTPUT=$($SAPCONTROL_CMD)
+
+# Check if any instance is down
+INSTANCES_DOWN=$(echo "$SAP_CONTROL_OUTPUT" | grep -E "GRAY|RED" | wc -l)
+
+# Generate alert if any instance is down
+if [ $INSTANCES_DOWN -gt 0 ]; then
+    echo "CRITICAL - Some instances are down in the SAP system"
+    exit 2  # Exit with critical status
+else
+    echo "OK - All instances are running in the SAP system"
+    exit 0  # Exit with OK status
+fi

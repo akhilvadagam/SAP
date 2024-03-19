@@ -1,0 +1,60 @@
+#!/bin/bash
+
+## need to run a cronjob for executing 'R3trans -d'
+
+# Specify the path to the trans.log file
+LOG_FILE="/sapmnt/TS1/profile/trans.log"
+
+# Keyword to check for in the logs
+KEYWORD="End of Transport (0000)"
+
+# Function to check the log file for the keyword
+check_logs() {
+    if [ ! -f "$LOG_FILE" ]; then
+        echo "ERROR: Log file '$LOG_FILE' does not exist"
+        exit 3  # 3 represents unknown status in Nagios plugins
+    fi
+
+    if grep -q "$KEYWORD" "$LOG_FILE"; then
+        echo "OK: Keyword '$KEYWORD' found in the trans.log file"
+        exit 0  # 0 represents OK status in Nagios plugins
+    else
+        echo "CRITICAL: Keyword '$KEYWORD' not found in the trans.log file"
+        exit 2  # 2 represents critical status in Nagios plugins
+    fi
+}
+
+# Main execution
+check_logs
+
+---------------------------------------------------------------------------------------------
+
+#!/bin/bash
+
+# Specify the path to the trans.log file
+LOG_FILE="/sapmnt/TS1/profile/trans.log"
+
+# Keyword to check for in the logs
+KEYWORD="End of Transport (0000)"
+
+# Function to check the log file for the keyword
+check_logs() {
+    if [ ! -f "$LOG_FILE" ]; then
+        echo "CRITICAL: Log file '$LOG_FILE' does not exist"
+        exit 2  # Exit with critical status
+    fi
+
+    if grep -q "$KEYWORD" "$LOG_FILE"; then
+        echo "OK: Keyword '$KEYWORD' found in the trans.log file"
+        exit 0  # Exit with OK status
+    else
+        echo "CRITICAL: Keyword '$KEYWORD' not found in the trans.log file"
+        exit 2  # Exit with critical status
+    fi
+}
+
+# Main execution
+check_logs
+
+
+

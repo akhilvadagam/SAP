@@ -1,0 +1,139 @@
+#!/bin/bash
+
+# Check if the required argument is provided
+if [ "$#" -ne 1 ]; then
+    echo "Usage: $0 <RESPONSE_TIME_THRESHOLD>"
+    exit 2  # Exit with critical status
+fi
+
+# Fetch the System ID (SID), instance name, and hostname dynamically
+SID=$SDB_SID
+HOSTNAME=$(hostname)
+INSTANCE_NAME=
+
+# Construct the SAP profile dynamically
+SAP_PROFILE="${SID}_${INSTANCE_NAME}_${HOSTNAME}"
+
+# Response time threshold
+RESPONSE_TIME_THRESHOLD="$1"
+
+# Navigate to the profile directory using 'cdpro'
+cd /usr/sap/<$SAPSYSTEMNAME>/SYS/profile
+
+# Execute dpmon with the dynamically constructed profile and input commands sequentially
+echo -e "dpmon pf=$SAP_PROFILE\nm\np\na" | ./sap_cli_command > temp_output.txt
+
+# Check if type DIA is available in the output file
+if grep -q "DIA" temp_output.txt; then
+    # Extract the value of time (adjust the grep command as per your output format)
+    TIME_VALUE=$(grep "type DIA" temp_output.txt | awk '{print $NF}')
+    
+    # Check if the time value is greater than the specified threshold
+    if [ "$TIME_VALUE" -gt "$RESPONSE_TIME_THRESHOLD" ]; then
+        echo "CRITICAL - Response time of Dialog work process is greater than $RESPONSE_TIME_THRESHOLD ms: $TIME_VALUE ms"
+        exit 2  # Exit with critical status
+    else
+        echo "OK - Response time of Dialog work process is within acceptable limits: $TIME_VALUE ms"
+        exit 0  # Exit with OK status
+    fi
+else
+    echo "'type DIA' not found in the output"
+    exit 0  # Exit with OK status
+fi
+
+
+
+"echo "q" | /sapmnt/$/exe/dpmon pf=/sapmnt/$/profile/$_$_$ p"
+
+
+
+
+
+---------------------------------------------------------------------------------------
+
+
+
+
+#!/bin/bash
+
+# Define the profile name
+PROFILE_NAME="TS1_D00_antsaplta01"
+
+# Function to execute dpmon with the specified profile name
+execute_dpmon() {
+    echo "Executing dpmon with profile name: $PROFILE_NAME"
+    echo "dpmon pf=$PROFILE_NAME" | cdpro
+    sleep 2  # Wait for dpmon to start
+    echo "m"  # Press 'm' to access the dispatch monitor menu
+    sleep 2  # Wait for the menu to load
+    echo "l"  # Press 'l' to view the work process overview
+}
+
+# Main execution
+execute_dpmon
+
+
+
+---------------------------------------------------------------------------------------
+
+
+
+#!/bin/bash
+
+# Define the profile name
+PROFILE_NAME="TS1_D00_antsaplta01"
+
+# Function to execute dpmon with the specified profile name
+execute_dpmon() {
+    echo "Executing dpmon with profile name: $PROFILE_NAME"
+    expect << EOF
+        spawn cdpro
+        expect "=>"
+        send "dpmon pf=$PROFILE_NAME\r"
+        expect "=>"
+        send "m\r"
+        expect "Dispatcher Monitor Menu"
+        send "l\r"
+        expect "Work Process Overview"
+        send "\x1D"  # Send Ctrl+]
+        expect "=>"
+        send "exit\r"
+        expect eof
+EOF
+}
+
+# Main execution
+execute_dpmon
+
+
+
+
+---------------------------------------------------------------------------------------------
+
+#!/bin/bash
+
+# Define SAP credentials and profile name
+SAP_USER="sapuser"
+SAP_PASSWORD="password"
+PROFILE_NAME="TS1_D00_antsaplta01"
+
+# Define output file
+OUTPUT_FILE="dpmon_output.txt"
+
+# Function to execute dpmon command
+execute_dpmon() {
+    expect << EOF
+        spawn sapshcut -user $SAP_USER -pw $SAP_PASSWORD -host <hostname> -sysnr <system_number> -client <client_number> -cmd "dpmon pf=$PROFILE_NAME"
+        expect "=>"
+        send "exit\r"
+        expect eof
+EOF
+}
+
+# Main execution
+execute_dpmon > "$OUTPUT_FILE"
+echo "Output saved to $OUTPUT_FILE"
+
+
+---------------------------------------------------------------------------------------------
+

@@ -1,0 +1,23 @@
+/10 Excessive Dumping General Problem
+/11 SAPROUTER problems
+/12 Updates pending
+/13 Updates not active
+/14 Terminated updates
+/15 Response time of Spool work process exceeds critical threshold
+/16 Spool size exceeds 1000 pages
+/17 SAPGUI main menue longer than 100 ms
+/18 Number buffer performance problems
+/19 No more free directory entries available
+/2 Critical alerts based on MTE class
+/22 Dialog wait time for CPU gt 3% of total response time
+/23 Excessive update problems
+/24 Average private memory is at a critical level
+/25 More than 5 LAN errors per second
+/26 SAPGUI login screen longer than 50 ms
+/27 Very old locks on the system
+/3 Less than 3 days until filesystem will probably be filled
+/4 Less than 1 day until filesystem will probably be filled
+/eg
+/man sap
+/snmp
+/test

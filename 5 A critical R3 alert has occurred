@@ -1,0 +1,20 @@
+#!/bin/bash
+
+# Set the SAP instance number
+INSTANCE_NUMBER="00"
+
+# SAP Control Command to check system availability
+SAPCONTROL_CMD="/sapmnt/TS1/exe/uc/linuxx86_64/sapcontrol -nr $INSTANCE_NUMBER -function GetProcessList"
+
+# Run SAP Control Command
+SAP_CONTROL_OUTPUT=$($SAPCONTROL_CMD 2>&1)
+
+# Check if the connection was successful
+if echo "$SAP_CONTROL_OUTPUT" | grep -q "OK"; then
+    echo "OK - Successfully connected to R/3 system (Instance $INSTANCE_NUMBER)"
+    exit 0  # Exit with OK status
+else
+    echo "CRITICAL - Unable to connect to R/3 system (Instance $INSTANCE_NUMBER)"
+    exit 2  # Exit with critical status
+fi
+
